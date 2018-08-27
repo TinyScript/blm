@@ -22,7 +22,7 @@ export default class StandardTable extends PureComponent {
     current:0,
     audit_state:1,
     searchValue:'',
-    expandedRowKeys:[]
+    expandedRowKeys:[],
   };
 
   componentDidMount() {
@@ -40,7 +40,7 @@ export default class StandardTable extends PureComponent {
           page_size:10,
           audit_state:1,
           OrganizationId:this.state.OrganizationId,
-          IsDisable: true,
+          is_disable:this.state.audit_state==2?true:false,
         }
       });
     })
@@ -102,7 +102,7 @@ export default class StandardTable extends PureComponent {
     const {dispatch} = this.props;
     this.setState({
       searchValue:val,
-      current:1
+      current:1,
     },()=>{
       dispatch({
         type: 'community/queryCommunityList',
@@ -111,7 +111,8 @@ export default class StandardTable extends PureComponent {
           OrganizationId: this.state.OrganizationId,
           page_size:10,
           audit_state:this.state.audit_state,
-          search:val
+          search:val,
+          is_disable:this.state.audit_state==2?true:false,
         },
       });
     })
@@ -121,7 +122,7 @@ export default class StandardTable extends PureComponent {
     const {dispatch} = this.props;
     this.setState({
       audit_state:parseInt(val.target.value),
-      current:1
+      current:1,
     },()=>{
       dispatch({
         type: 'community/queryCommunityList',
@@ -131,7 +132,7 @@ export default class StandardTable extends PureComponent {
           page_size:10,
           audit_state:this.state.audit_state,
           search:this.state.search,
-          
+          is_disable:this.state.audit_state==2?true:false,
         },
       });
     })
@@ -161,6 +162,7 @@ export default class StandardTable extends PureComponent {
             OrganizationId: this.state.OrganizationId,
             page_size:10,
             audit_state:this.state.audit_state,
+            is_disable:this.state.audit_state==2?true:false,
           },
         });
       });
@@ -312,7 +314,7 @@ export default class StandardTable extends PureComponent {
               <Link style={{float:'right'}} to="/group/&community&/communityAdd"><Button  type="primary" ghost  icon="plus">添加社团</Button></Link>
               <Table
                 bordered
-                columns={this.state.audit_state===1 ?   columns :  Unaudited}
+                columns={this.state.audit_state===0 ?   Unaudited :  columns}
                 rowKey="GroupId"
                 expandedRowRender={record => userInfo(record)}
                 expandRowByClick

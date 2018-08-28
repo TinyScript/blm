@@ -142,3 +142,12 @@ export async function submitTaskDelete(params) {
     body: params,
   });
 }
+
+/**
+ * 获取群组列表
+ * @param params
+ * @returns {Promise<Object>}
+ */
+export async function queryGroupList(params) {
+  return request(`/api/v1/community/org/team/list/${params.OrganizationId}?${stringify(params)}`)
+}

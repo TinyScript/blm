@@ -154,6 +154,7 @@ export default class PurchaseDefault extends Component {
         2: <div><Button disabled icon="delete" /><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/edit/${value.TaskId}`}><Button disabled icon="edit" /></Link><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/resetAdd/${value.TaskId}`}>重新开团</Link><Divider type="vertical" /><a onClick={()=>{this.switchEnd(true,value.TaskId)}}>截团</a></div>,
         3: <div><Button disabled icon="delete" /><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/edit/${value.TaskId}`}><Button disabled icon="edit" /></Link><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/resetAdd/${value.TaskId}`}>重新开团</Link><Divider type="vertical" /><a onClick={()=>{this.submitSend(value.TaskId,value.OrganizationId)}}>确认配送</a></div>,
         4: <div><Button disabled icon="delete" /><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/edit/${value.TaskId}`}><Button icon="edit" /></Link><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/resetAdd/${value.TaskId}`}>重新开团</Link></div>,
+        5: <div><Button disabled icon="delete" /><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/edit/${value.TaskId}`}><Button disabled icon="edit" /></Link><Divider type="vertical" /><Link to={`/group/&groupPurchaseList&/resetAdd/${value.TaskId}`}>重新开团</Link></div>,
       }:'';
 
       return shapeType[value.GroupState];

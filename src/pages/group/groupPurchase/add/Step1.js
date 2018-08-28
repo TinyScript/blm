@@ -1,22 +1,73 @@
 import React, { PureComponent } from 'react';
-import { Form, Switch,Input, Button,DatePicker,Radio } from 'antd';
+import { Form, Switch,Input, Button,DatePicker,Radio,Modal, } from 'antd';
 import moment from 'moment';
+import GroupListTable from './components/GroupListTable';
+// import {getLocalStorage} from '../../../../utils/utils'
 const {TextArea} = Input ;
 const RadioGroup = Radio.Group;
+// const userData = getLocalStorage('userData');
 class Step1 extends PureComponent {
 
   state = {
     startValue: null,
     ShowStartTime: null,
     endValue: null,
+    isChooseGroup: false,
+    originTeamIds: [],
+    originTeamVisibleState: '',
   };
+
+  componentDidMount = () => {
+    const {data} = this.props;
+    console.log(data);
+    this.setState({
+      originTeamIds: data.TeamIds ? data.TeamIds:[],
+      originTeamVisibleState: data.TeamVisibleState ? data.TeamVisibleState:0,
+    })
+  }
+
   disabledStartDate = (startValue) => {
     return startValue && startValue.format('YYYY-MM-DD 00:00') < moment().format('YYYY-MM-DD 00:00');
   }
 
+  chooseGroup = () => {
+    this.setState({
+      isChooseGroup:true,
+    })
+  }
+
+  confirmGroup = () => {
+    const {dispatch,data} = this.props;
+    if(!data.TeamIds||data.TeamIds.length==0){
+      data.TeamVisibleState = 0;
+    }
+    dispatch({
+      type:'purchaseAdd/setAdd',
+      payload:{
+        ...data,
+      }
+    })
+    this.setState({
+      isChooseGroup:false,
+    })
+  }
+
+  unChooseGroup = () => {
+    const {dispatch,data} = this.props;
+    data.TeamIds = this.state.originTeamIds;
+    data.TeamVisibleState = this.state.originTeamVisibleState;
+    dispatch({
+      type:'purchaseAdd/setAdd',
+      payload:{
+        ...data,
+      }
+    })
+    this.setState({
+      isChooseGroup:false,
+    })
+  }
 
   onChange = (field, value) => {
-
     this.setState({
       [field]: value,
     });
@@ -36,6 +87,17 @@ class Step1 extends PureComponent {
   setSellType(e){
     const {dispatch,data} = this.props;
     data['SellType'] = e ? 2 : 1;
+    dispatch({
+      type:'purchaseAdd/setAdd',
+      payload:{
+        ...data,
+      }
+    })
+  }
+
+  setVisibleType(e){
+    const {dispatch,data} = this.props;
+    data['TeamVisibleState'] = e ? 1 : 0;
     dispatch({
       type:'purchaseAdd/setAdd',
       payload:{
@@ -164,7 +226,6 @@ class Step1 extends PureComponent {
                 placeholder="请选择日期"
               />
             )}
-
           </Form.Item>:''}
           <Form.Item
             {...formItemLayout}
@@ -185,9 +246,31 @@ class Step1 extends PureComponent {
                 <Radio value={0}>否<br/></Radio>
               </RadioGroup>
             )}
-
           </Form.Item>
+          <Form.Item
+            {...formItemLayout}
+            label="部分社团可见"
+          >
+            <Switch checked={data.TeamVisibleState===1 ? true : false} onChange={(e)=>{this.setVisibleType(e)}}/>
+          </Form.Item>
+          {data.TeamVisibleState === 1?<Form.Item
+            {...formItemLayout}
+            colon={false}
+            required={false}
+            label=" "
+          >
+            <Button onClick={this.chooseGroup}>请选择群组</Button>
+          </Form.Item>:''}
         </Form>
+        <Modal 
+          title="选择群组"
+          visible={this.state.isChooseGroup}
+          onOk={this.confirmGroup}
+          onCancel={this.unChooseGroup}
+        >
+          <GroupListTable data = { data }></GroupListTable>
+          <p style = {{ color: 'red', }}>tips:选择群组前，请先在“社团管理-社团群组”中创建群组。</p>
+        </Modal>
       </div>
     );
   }

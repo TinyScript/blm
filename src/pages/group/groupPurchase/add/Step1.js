@@ -2,10 +2,8 @@ import React, { PureComponent } from 'react';
 import { Form, Switch,Input, Button,DatePicker,Radio,Modal, } from 'antd';
 import moment from 'moment';
 import GroupListTable from './components/GroupListTable';
-// import {getLocalStorage} from '../../../../utils/utils'
 const {TextArea} = Input ;
 const RadioGroup = Radio.Group;
-// const userData = getLocalStorage('userData');
 class Step1 extends PureComponent {
 
   state = {

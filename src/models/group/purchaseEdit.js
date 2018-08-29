@@ -12,7 +12,8 @@ if(userData.Staff.GroupBuyingMode===2){
 const {
   uploadPurchaseEdit,
   queryPurchaseEdit,
-  queryImgToken
+  queryImgToken,
+  queryGroupList,
 } = api;
 
 import {routerRedux} from 'dva/router'
@@ -38,6 +39,11 @@ export default {
     Tokens:{},
     stepFormSubmitting: false,
     loading: false,
+    groupList:{
+      loading:false,
+      hasMore:true,
+      List:[]
+    },
   },
 
   effects: {
@@ -186,12 +192,26 @@ export default {
         payload: false,
       });
     },
+    *queryGroupList({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(queryGroupList, payload);
+      yield put({
+        type: 'getGroupList',
+        payload: response,
+      });
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      });
+    },
   },
 
   reducers: {
 
     setAdd(state, action) {
-      console.log(action);
       return {
         ...state,
         data:action.payload
@@ -221,6 +241,12 @@ export default {
           name:action.payload.OriginalFileName,
           token:action.payload.Token,
         },
+      };
+    },
+    getGroupList(state, { payload }) {
+      return {
+        ...state,
+        groupList:payload.Data,
       };
     },
   },

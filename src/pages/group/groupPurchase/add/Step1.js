@@ -17,7 +17,6 @@ class Step1 extends PureComponent {
 
   componentDidMount = () => {
     const {data} = this.props;
-    console.log(data);
     this.setState({
       originTeamIds: data.TeamIds ? data.TeamIds:[],
       originTeamVisibleState: data.TeamVisibleState ? data.TeamVisibleState:0,

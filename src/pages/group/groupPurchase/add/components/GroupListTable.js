@@ -19,6 +19,7 @@ class GroupListTable extends PureComponent {
 
   getData(){
     const {dispatch} = this.props;
+    console.log(this.props)
     dispatch({
       type: 'purchaseAdd/queryGroupList',
       payload:{

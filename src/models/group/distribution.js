@@ -66,6 +66,7 @@ export default {
         payload: true,
       });
       const response = yield call(queryRouteList, payload);
+      console.log(response);
       yield put({
         type: 'getRouteList',
         payload: response,
@@ -142,10 +143,7 @@ export default {
     getRouteList(state, { payload }) {
       return {
         ...state,
-        routeList:{
-          ...state.finishBuyingList,
-          List:[...state.finishBuyingList.List,...payload.Data.List]
-        },
+        routeList: payload.Data,
       };
     },
     changeLoading(state, action) {

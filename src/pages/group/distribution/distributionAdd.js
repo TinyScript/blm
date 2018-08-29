@@ -20,7 +20,10 @@ export default class distributionAdd extends PureComponent {
   state = {
     page:1,
     isChooseRoad:false,
+    
   }
+  OrganizationId = ''
+  TaskId = ''
 
   formatTime(val,formatString='YYYY年MM月DD日'){
     return moment(val).utcOffset(val).format(formatString)
@@ -151,16 +154,18 @@ export default class distributionAdd extends PureComponent {
   }
 
   chooseRoutes = (OrganizationId,TaskId) => {
-    const {dispatch} = this.props;
-    dispatch({
-      type: 'distribution/queryRouteList',
-      payload:{
-        OrganizationId:OrganizationId,
-        TaskId:TaskId,
-        page:1,
-        page_size:10,
-      }
-    });
+    // const {dispatch} = this.props;
+    // dispatch({
+    //   type: 'distribution/queryRouteList',
+    //   payload:{
+    //     OrganizationId:OrganizationId,
+    //     TaskId:TaskId,
+    //     page:1,
+    //     page_size:10,
+    //   }
+    // });
+    this.OrganizationId = OrganizationId;
+    this.TaskId = TaskId;
     this.setState({
       isChooseRoad:true,
     })
@@ -257,15 +262,14 @@ export default class distributionAdd extends PureComponent {
           </div>
           <div style={{display:'flex',marginTop:20,justifyContent:'center'}} ><Button loading={loading} onClick={()=>{this.handlerSubmit()}}>创建</Button></div>
         </Card>
-        {this.state.isChooseRoad ? <Modal title="编辑路线"
+        <Modal 
+          title="编辑路线"
           visible={this.state.isChooseRoad}
-          onOk={this.chooseRoad()}
-          confirmLoading={loading}
-          onCancel={()=>{this.unChooseRoutes()}}
+          onOk={this.chooseRoad}
+          onCancel={this.unChooseRoutes}
         >
-          {/* <RouteListTable OrganizationId={this.state.OrganizationId}/> */}
-          <RouteListTable/>
-        </Modal>: ''}
+          <RouteListTable OrganizationId={this.OrganizationId || ''}  TaskId={this.TaskId || ''}></RouteListTable>
+        </Modal>
       </PageHeaderLayout>
 
     );

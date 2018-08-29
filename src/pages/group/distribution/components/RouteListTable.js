@@ -1,30 +1,29 @@
 import React, {PureComponent} from 'react';
 import {Table, Divider, Switch,Button} from 'antd';
 import styles from './RouteListTable.less';
-import {connect} from 'dva'
+import {connect} from 'dva';
 
 @connect(state => ({
-  groupUser: state.distribution,
+  distributionInfo: state.distribution,
 }))
-class UserListTable extends PureComponent {
+class RouteListTable extends PureComponent {
   state = {
     
   };
 
-
-  // componentDidMount() {
-  //   this.getData();
-  // }
+  componentDidMount() {
+    this.getData();
+  }
 
   getData(){
-    const {OrganizationId} = this.props;
-    console.log(this.props);
+    const {OrganizationId,TaskId} = this.props;
+    console.log(OrganizationId,TaskId);
     const {dispatch} = this.props;
     dispatch({
       type: 'distribution/queryRouteList',
       payload:{
-        id:OrganizationId,
-        taskId:taskId,
+        OrganizationId:OrganizationId,
+        TaskId:TaskId,
         page:1,
         page_size:10,
       }
@@ -32,54 +31,41 @@ class UserListTable extends PureComponent {
   }
 
   render() {
-    // const {groupUser: {data:{List ,pagination,Count}, loading}} = this.props;
-
+    const {distributionInfo: { routeList:{List}, loading}} = this.props;
+    console.log(List);
     let columns = [
       {
-        title: '路线名称', dataIndex: 'UserId',
+        title: '路线名称', 
+        dataIndex: 'LineName',
       },
       {
         title: '导出记录',
-        dataIndex: 'OrganizationName',
+        dataIndex: 'UpdateTime',
       },
     ];
     columns.push({
       title: '操作',
-      render: (row) => {
-        // if(row.RoleName==="超级管理员"){
-        //   return ''
-        // }
+      render: (text,record,index) => {
         return (
           <div>
-            {/* <a onClick={()=>{this.showEditDialog(row)}}>编辑</a>
-            <Divider type="vertical"/>
-            <Switch checkedChildren="开启" defaultChecked={!row.IsDisable} onChange={(val)=>{change(val,row)}} unCheckedChildren="禁用"  /> */}
+            <Switch checkedChildren="开启" defaultChecked={ true } onChange={(val)=>{this.change(val,record)}} unCheckedChildren="禁用"  />
           </div>
         )},
     },)
-    // const paginationProps = {
-    //   showSizeChanger: true,
-    //   showQuickJumper: true,
-    //   total: Count,
-    //   ...pagination,
-    // };
     return (
-      
       <div className={styles.container}>
-        111
-        {/* <Table
+        <Table
           bordered
           className={styles.table}
           loading={loading}
-          rowKey='UserId'
+          rowKey='LineId'
           dataSource={List}
           columns={columns}
-          pagination={paginationProps}
-        /> */}
-
+          pagination={false}
+        />
       </div>
     );
   }
 }
 
-export default UserListTable;
+export default RouteListTable;

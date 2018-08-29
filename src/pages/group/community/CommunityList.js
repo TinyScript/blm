@@ -299,7 +299,9 @@ export default class StandardTable extends PureComponent {
     );
     return (
       <PageHeaderLayout
-        breadcrumbList={breadcrumbList}>
+        breadcrumbList={breadcrumbList}
+      >
+        
         <Card bordered={false}
               extra={extraContent}
               title="社团列表">

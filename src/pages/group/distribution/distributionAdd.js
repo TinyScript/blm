@@ -62,7 +62,6 @@ export default class distributionAdd extends PureComponent {
     const {dispatch,distribution:{finishBuyingList}}  = this.props;
     // let newData = finishBuyingList
     finishBuyingList.List.map((val,index)=>{
-
       if(val.TaskId === id ){
         finishBuyingList.List[index].isChecked = e.target.checked;
       }

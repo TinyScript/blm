@@ -48,7 +48,7 @@ class RouteListTable extends PureComponent {
       render: (text,record,index) => {
         return (
           <div>
-            <Switch checkedChildren="开启" defaultChecked={ true } onChange={(val)=>{this.change(val,record)}} unCheckedChildren="禁用"  />
+            <Switch checkedChildren="开启" defaultChecked={ record.IsSelected } onChange={(val)=>{this.change(val,record)}} unCheckedChildren="禁用"  />
           </div>
         )},
     },)

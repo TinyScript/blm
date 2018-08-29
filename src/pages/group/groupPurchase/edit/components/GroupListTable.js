@@ -6,7 +6,7 @@ import {getLocalStorage} from '../../../../../utils/utils'
 
 const userData = getLocalStorage('userData');
 @connect(state => ({
-  purchaseInfo: state.purchaseAdd,
+  purchaseInfo: state.purchaseEdit,
 }))
 class GroupListTable extends PureComponent {
   state = {
@@ -20,7 +20,7 @@ class GroupListTable extends PureComponent {
   getData(){
     const {dispatch} = this.props;
     dispatch({
-      type: 'purchaseAdd/queryGroupList',
+      type: 'purchaseEdit/queryGroupList',
       payload:{
         OrganizationId:userData.id,
         page:1,
@@ -45,7 +45,7 @@ class GroupListTable extends PureComponent {
     data.TeamIds = midArray;
     
     dispatch({
-      type:'purchaseAdd/setAdd',
+      type:'purchaseEdit/setAdd',
       payload:{
         ...data,
       }

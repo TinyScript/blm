@@ -68,10 +68,6 @@ class GroupListTable extends PureComponent {
         title: '路线名称', 
         dataIndex: 'Name',
       },
-      {
-        title: '导出记录',
-        dataIndex: 'GroupCount',
-      },
     ];
     columns.push({
       title: '操作',

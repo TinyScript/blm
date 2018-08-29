@@ -197,8 +197,9 @@ export default class distributionAdd extends PureComponent {
             <div style={{marginLeft:110,marginTop:4}}>
               <h4>名称：{val.Title}</h4>
               <div>截单时间：{this.formatTime(val.EndTime,'YYYY.MM.DD HH:mm')}</div>
-              <Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={()=>{this.chooseRoutes(val.OrganizationId,val.TaskId)}}>全选路线</Button>
-              <Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={()=>{this.chooseRoutes(val.OrganizationId,val.TaskId)}}>部分路线</Button>
+              {
+                val.IsSelectedAllLines?<Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={()=>{this.chooseRoutes(val.OrganizationId,val.TaskId)}}>全选路线</Button>:<Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={()=>{this.chooseRoutes(val.OrganizationId,val.TaskId)}}>部分路线</Button>
+              }
             </div>
           </Checkbox>
           <Divider type="horizontal" />

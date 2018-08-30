@@ -119,7 +119,7 @@ export default {
         payload: false,
       });
 
-    }
+    },
   },
 
   reducers: {
@@ -185,6 +185,17 @@ export default {
           List:[]
         },
       }
-    }
+    },
+    lineChange(state, { payload }) {
+      state.finishBuyingList.List[payload.groupIndex].LineList[payload.index].IsSelected = payload.val;
+      return {
+        ...state,
+        // finishBuyingList:{
+        //   loading:false,
+        //   hasMore:true,
+        //   List:[]
+        // },
+      }
+    },
   },
 };

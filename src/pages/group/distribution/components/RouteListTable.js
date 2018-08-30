@@ -4,7 +4,7 @@ import styles from './RouteListTable.less';
 import {connect} from 'dva';
 
 @connect(state => ({
-  distributionInfo: state.distribution,
+  distribution: state.distribution,
 }))
 class RouteListTable extends PureComponent {
   state = {
@@ -12,27 +12,39 @@ class RouteListTable extends PureComponent {
   };
 
   componentDidMount() {
-    this.getData();
+    // this.getData();
   }
 
-  getData(){
-    const {OrganizationId,TaskId} = this.props;
-    console.log(OrganizationId,TaskId);
+  // getData(){
+  //   const {OrganizationId,TaskId} = this.props;
+  //   console.log(OrganizationId,TaskId);
+  //   const {dispatch} = this.props;
+  //   dispatch({
+  //     type: 'distribution/queryRouteList',
+  //     payload:{
+  //       OrganizationId:OrganizationId,
+  //       TaskId:TaskId,
+  //       page:1,
+  //       page_size:10,
+  //     }
+  //   });
+  // }
+
+  change = (val,groupIndex,index) => {
     const {dispatch} = this.props;
     dispatch({
-      type: 'distribution/queryRouteList',
+      type:'distribution/lineChange',
       payload:{
-        OrganizationId:OrganizationId,
-        TaskId:TaskId,
-        page:1,
-        page_size:10,
+        val,
+        groupIndex,
+        index,
       }
-    });
+    })
   }
 
   render() {
-    const {distributionInfo: { routeList:{List}, loading}} = this.props;
-    console.log(List);
+    const { distribution:{ finishBuyingList: { List } }, groupIndex, lineList } = this.props;
+    let selectList = List[groupIndex].LineList;
     let columns = [
       {
         title: '路线名称', 
@@ -48,7 +60,7 @@ class RouteListTable extends PureComponent {
       render: (text,record,index) => {
         return (
           <div>
-            <Switch checkedChildren="开启" defaultChecked={ record.IsSelected } onChange={(val)=>{this.change(val,record)}} unCheckedChildren="禁用"  />
+            <Switch checkedChildren="开启" checked={ record.IsSelected } onChange={(val)=>{this.change(val,groupIndex,index)}} unCheckedChildren="禁用"  />
           </div>
         )},
     },)
@@ -57,9 +69,8 @@ class RouteListTable extends PureComponent {
         <Table
           bordered
           className={styles.table}
-          loading={loading}
           rowKey='LineId'
-          dataSource={List}
+          dataSource={selectList}
           columns={columns}
           pagination={false}
         />

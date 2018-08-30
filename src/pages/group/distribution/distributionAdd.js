@@ -22,8 +22,6 @@ export default class distributionAdd extends PureComponent {
     isChooseRoad:false,
     
   }
-  OrganizationId = ''
-  TaskId = ''
 
   formatTime(val,formatString='YYYY年MM月DD日'){
     return moment(val).utcOffset(val).format(formatString)
@@ -139,32 +137,33 @@ export default class distributionAdd extends PureComponent {
 
     finishBuyingList.List.map(val=>{
       if(val.isChecked){
-        data.push(val.TaskId)
+        let midObj = {};
+        midObj.TaskId = val.TaskId;
+        let midArray = [];
+        val.LineList.map(val => {
+          if(val.IsSelected){
+            midArray.push(val.LineId);
+          }
+        })
+        midObj.LineIds = midArray;
+        data.push(midObj);
       }
     })
 
     dispatch({
       type:'distribution/submitDistributionAdd',
       payload:{
-        TaskIds:data,
+        TaskLineIds:data,
         OrganizationId:userData.id
       }
     })
   }
 
-  chooseRoutes = (OrganizationId,TaskId) => {
-    // const {dispatch} = this.props;
-    // dispatch({
-    //   type: 'distribution/queryRouteList',
-    //   payload:{
-    //     OrganizationId:OrganizationId,
-    //     TaskId:TaskId,
-    //     page:1,
-    //     page_size:10,
-    //   }
-    // });
-    this.OrganizationId = OrganizationId;
-    this.TaskId = TaskId;
+  LineList = [];
+  index = 0;
+  chooseRoutes = (LineList,i) => {
+    this.LineList = LineList;
+    this.index = i;
     this.setState({
       isChooseRoad:true,
     })
@@ -176,8 +175,10 @@ export default class distributionAdd extends PureComponent {
     })
   }
 
-  chooseRoad(){
-
+  chooseRoad = () => {
+    this.setState({
+      isChooseRoad:false,
+    })
   }
 
   getCheckList(data){
@@ -198,7 +199,7 @@ export default class distributionAdd extends PureComponent {
               <h4>名称：{val.Title}</h4>
               <div>截单时间：{this.formatTime(val.EndTime,'YYYY.MM.DD HH:mm')}</div>
               {
-                val.IsSelectedAllLines?<Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={()=>{this.chooseRoutes(val.OrganizationId,val.TaskId)}}>全选路线</Button>:<Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={()=>{this.chooseRoutes(val.OrganizationId,val.TaskId)}}>部分路线</Button>
+                val.IsSelectedAllLines?<Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={()=>{this.chooseRoutes(val.LineList,i)}}>全选路线</Button>:<Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={()=>{this.chooseRoutes(val.LineList,i)}}>部分路线</Button>
               }
             </div>
           </Checkbox>
@@ -209,7 +210,7 @@ export default class distributionAdd extends PureComponent {
   };
 
   render() {
-    const {distribution:{finishBuyingList,loading}}  = this.props;
+    const {distribution:{ finishBuyingList, loading }}  = this.props;
 
     const breadcrumbList = [
       {
@@ -268,7 +269,7 @@ export default class distributionAdd extends PureComponent {
           onOk={this.chooseRoad}
           onCancel={this.unChooseRoutes}
         >
-          <RouteListTable OrganizationId={this.OrganizationId || ''}  TaskId={this.TaskId || ''}></RouteListTable>
+          <RouteListTable lineList={this.LineList} groupIndex = {this.index}></RouteListTable>
         </Modal>
       </PageHeaderLayout>
 

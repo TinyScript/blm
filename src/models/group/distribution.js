@@ -66,7 +66,6 @@ export default {
         payload: true,
       });
       const response = yield call(queryRouteList, payload);
-      console.log(response);
       yield put({
         type: 'getRouteList',
         payload: response,

@@ -1,7 +1,8 @@
 import React, {PureComponent} from 'react';
 import { Link } from 'dva/router';
 import {connect} from 'dva';
-import {Table,Divider,Card,Input,Radio,Button, Switch,} from 'antd';
+import {Table,Divider,Card,Input,Radio,Button, Switch,Modal,Form, Icon,} from 'antd';
+const FormItem = Form.Item;
 import styles from './Community.less';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 const {Search} = Input;
@@ -14,6 +15,7 @@ const userData = getLocalStorage('userData');
 @connect(state => ({
   community: state.community,
 }))
+@Form.create()
 export default class StandardTable extends PureComponent {
 
   state = {
@@ -23,6 +25,8 @@ export default class StandardTable extends PureComponent {
     audit_state:1,
     searchValue:'',
     expandedRowKeys:[],
+    operationkey: '2',
+    groupVisible: false,
   };
 
   componentDidMount() {
@@ -41,6 +45,14 @@ export default class StandardTable extends PureComponent {
           audit_state:1,
           OrganizationId:this.state.OrganizationId,
           is_disable:this.state.audit_state==2?true:false,
+        }
+      });
+      dispatch({
+        type: 'community/queryGroupList',
+        payload:{
+          page:1,
+          page_size:10,
+          OrganizationId:this.state.OrganizationId,
         }
       });
     })
@@ -167,7 +179,7 @@ export default class StandardTable extends PureComponent {
         });
       });
   }
-  render() {
+  renderCommunityList = () => {
     const {community:{communityList:{List,Count},loading,pagination}} = this.props;
     const {dispatch} = this.props;
     const userInfo = ()=>{
@@ -218,15 +230,6 @@ export default class StandardTable extends PureComponent {
         </div>
       )
     }
-    const breadcrumbList = [
-      {
-        title: '首页',
-        href: '/'
-      },
-      {
-        title:'社团管理',
-      }
-    ]
 
     let columns = [
       { title: '所属团组织',dataIndex: 'OrganizationName',render:()=>(this.state.OrganizationName)} ,
@@ -298,41 +301,215 @@ export default class StandardTable extends PureComponent {
       </div>
     );
     return (
-      <PageHeaderLayout
-        breadcrumbList={breadcrumbList}
-      >
-        
-        <Card bordered={false}
-              extra={extraContent}
-              title="社团列表">
-
-          <div>
-            <div className={styles.standardTable}>
-              <RadioGroup onChange={this.radioOnChange.bind(this)} style={{marginBottom:20}} defaultValue="1">
-                <RadioButton value="1">已审核</RadioButton>
-                <RadioButton value="0">未审核</RadioButton>
-                <RadioButton value="2">已禁用</RadioButton>
-              </RadioGroup>
-              <Link style={{float:'right'}} to="/group/&community&/communityAdd"><Button  type="primary" ghost  icon="plus">添加社团</Button></Link>
-              <Table
-                bordered
-                columns={this.state.audit_state===0 ?   Unaudited :  columns}
-                rowKey="GroupId"
-                expandedRowRender={record => userInfo(record)}
-                expandRowByClick
-                expandedRowKeys={this.state.expandedRowKeys}
-                onExpand={(val,text)=>{this.getInfo(val,text)}}
-                dataSource={List}
-                loading={loading}
-                pagination={paginationProps}
-                onChange={this.accountListTableChange}
-              />
-
-            </div>
+      <Card bordered={false}
+            extra={extraContent}
+            title="社团列表">
+        <div>
+          <div className={styles.standardTable}>
+            <RadioGroup onChange={this.radioOnChange.bind(this)} style={{marginBottom:20}} defaultValue="1">
+              <RadioButton value="1">已审核</RadioButton>
+              <RadioButton value="0">未审核</RadioButton>
+              <RadioButton value="2">已禁用</RadioButton>
+            </RadioGroup>
+            <Link style={{float:'right'}} to="/group/&community&/communityAdd"><Button  type="primary" ghost  icon="plus">添加社团</Button></Link>
+            <Table
+              bordered
+              columns={this.state.audit_state===0 ?   Unaudited :  columns}
+              rowKey="GroupId"
+              expandedRowRender={record => userInfo(record)}
+              expandRowByClick
+              expandedRowKeys={this.state.expandedRowKeys}
+              onExpand={(val,text)=>{this.getInfo(val,text)}}
+              dataSource={List}
+              loading={loading}
+              pagination={paginationProps}
+              onChange={this.accountListTableChange}
+            />
           </div>
-        </Card>
-      </PageHeaderLayout>
+        </div>
+      </Card>
+    )
+  }
 
+  groupOperate = 'add'
+  groupOperateInfo = {};
+  showGroupModal = () => {
+    this.props.form.resetFields();
+    this.groupOperate = 'add';
+    this.groupOperateInfo = {};
+    this.setState({
+      groupVisible: true,
+    });
+  }
+
+  editGroupModal = (e,record) => {
+    e.preventDefault();
+    this.groupOperate = 'edit';
+    this.groupOperateInfo = record;
+    this.props.form.setFieldsValue({
+      TeamName: record.Name,
+    });
+    this.setState({
+      groupVisible: true,
+    });
+  }
+
+  deleteGroup = (e,record) => {
+    e.preventDefault();
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'community/deleteCommunityGroup',
+      payload: {
+        OrganizationId: this.state.OrganizationId,
+        TeamId: record.TeamId,
+      },
+    });
+  }
+
+  groupHandleOk = (e) => {
+    e.preventDefault();
+    const {dispatch} = this.props;
+    let that = this;
+    this.props.form.validateFields({ force: true },
+      (err, values) => {
+        if (!err) {
+          if(that.groupOperate == 'add'){
+            dispatch({
+              type: 'community/addCommunityGroup',
+              payload: {
+                OrganizationId: this.state.OrganizationId,
+                ...values,
+              },
+            });
+          }else if(that.groupOperate == 'edit'){
+            console.log(that.groupOperateInfo)
+            dispatch({
+              type: 'community/editCommunityGroup',
+              payload: {
+                OrganizationId: that.state.OrganizationId,
+                TeamId: that.groupOperateInfo.TeamId,
+                ...values,
+              },
+            });
+          }
+          this.setState({
+            groupVisible: false,
+          });
+        }
+      }
+    );
+  }
+
+  groupHandCancel = (e) => {
+    this.setState({
+      groupVisible: false,
+    });
+  }
+  renderCommunityGroup = () => {
+    const {community:{groupList:{List,Count},loading,pagination}} = this.props;
+    const {dispatch} = this.props;
+
+    let columns = [
+      { title: '群组ID',dataIndex: 'TeamId',} ,
+      { title: '群组名称', dataIndex: 'Name'},
+      { title: '社团数量', dataIndex: 'GroupCount'},
+    ];
+
+    columns.push({
+      title: '操作',
+      render : (text,record,index)=>{
+        return (
+          <div>
+            <Button onClick={(e)=>{this.editGroupModal(e,record)}}>编辑群组</Button>
+            <Divider type="vertical"/>
+            <Button><Link onClick={(e)=>{this.stop(e)}} to={`/group/&community&/communityGoup/${record.TeamId}`}>关联社团</Link></Button>
+            <Divider type="vertical"/>
+            <Button onClick={(e)=>{this.deleteGroup(e,record)}}>删除</Button>
+            {/* <Switch checkedChildren="开启" defaultChecked={!record.IsDisable} onChange={(val)=>{change(val,record)}} unCheckedChildren="禁用"  /> */}
+          </div>
+        )
+      }
+    })
+
+    const change = (val,payload)=>{
+      dispatch({
+        type: 'community/uploadCommunityState',
+        payload: {
+          OrganizationId:payload.OrganizationId,
+          GroupId:payload.GroupId,
+          IsDisable:!val,
+        },
+      })
+    }
+
+    const paginationProps = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      current:this.state.current,
+      total: Count,
+      ...pagination,
+    };
+
+    return (
+      <Card bordered={false}
+            title="社团群组">
+        <div className={styles.standardTable}>
+          <Button style={{marginBottom:20}} type="primary" onClick={(e)=>{this.showGroupModal(e)}}>添加群组</Button>
+          <Table
+            bordered
+            columns={columns}
+            rowKey="TeamId"
+            dataSource={List}
+            loading={loading}
+            pagination={paginationProps}
+            onChange={this.accountListTableChange}
+          />
+        </div>
+      </Card>
+    )
+  }
+  onOperationTabChange = (key) => {
+    this.setState({ operationkey: key });
+  }
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    const tabList = [
+      {
+        key: '1',
+        tab: '社团列表',
+      },
+      {
+        key: '2',
+        tab: '社团群组',
+      }
+    ];
+    return (
+      <PageHeaderLayout
+        tabList={tabList}
+        onTabChange={this.onOperationTabChange}
+        activeTabKey={this.state.operationkey}
+      >
+        {
+          this.state.operationkey == '2'?this.renderCommunityGroup():this.renderCommunityList()
+        }
+        <Modal
+          title="添加群组"
+          visible={this.state.groupVisible}
+          onOk={this.groupHandleOk}
+          onCancel={this.groupHandCancel}
+        >
+          <Form className="login-form">
+            <FormItem>
+              {getFieldDecorator('TeamName', {
+                initialValue: '',
+                rules: [{ required: true, message: '请输入群组名称' },{ max: 20, message: '最大长度不超过20位' }],
+              })(
+                <Input placeholder="请输入群组名称" />
+              )}
+            </FormItem>
+          </Form>
+        </Modal>
+      </PageHeaderLayout>
     );
   }
 }

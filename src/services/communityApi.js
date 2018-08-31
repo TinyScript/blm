@@ -19,6 +19,47 @@ export async function queryCommunityList(params) {
 }
 
 /**
+ * 获取社团群组列表
+ * @returns {Promise<Object>}
+ */
+export async function queryGroupList(params) {
+  return request(`/api/v1/community/org/team/list/${params.OrganizationId}?${stringify(params)}`)
+}
+
+/**
+ * 添加社团群组
+ * @returns {Promise<Object>}
+ */
+export async function addCommunityGroup(params) {
+  return request(`/api/v1/community/org/team/add/${params.OrganizationId}`,{
+    method:'POST',
+    body:params
+  })
+}
+
+/**
+ * 编辑社团群组
+ * @returns {Promise<Object>}
+ */
+export async function editCommunityGroup(params) {
+  return request(`/api/v1/community/org/team/edit/${params.OrganizationId}/${params.TeamId}`,{
+    method:'POST',
+    body:params
+  })
+}
+
+/**
+ * 删除社团群组
+ * @returns {Promise<Object>}
+ */
+export async function deleteCommunityGroup(params) {
+  return request(`/api/v1/community/org/team/delete/${params.OrganizationId}/${params.TeamId}`,{
+    method:'POST',
+    body:params
+  })
+}
+
+/**
  * 审核
  * @returns {Promise<Object>}
  */

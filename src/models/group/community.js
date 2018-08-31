@@ -1,6 +1,10 @@
 import {
   queryCommunityInfo,
   queryCommunityList,
+  queryGroupList,
+  addCommunityGroup,
+  editCommunityGroup,
+  deleteCommunityGroup,
   submitCommunityAudited,
   submitCommunityAdd,
   submitCommunityEdit,
@@ -14,6 +18,9 @@ export default {
 
   state: {
     communityList: {
+      list: [],
+    },
+    groupList: {
       list: [],
     },
     communityInfo: {
@@ -38,6 +45,84 @@ export default {
         type: 'changeLoading',
         payload: false,
       })
+    },
+    *queryGroupList({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(queryGroupList, payload);
+      yield put({
+        type: 'getGroupList',
+        payload: response,
+      });
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      })
+    },
+    *addCommunityGroup({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(addCommunityGroup, payload);
+      if(response.Message == "success"){
+        yield put({
+          type:'queryGroupList',
+          payload:{
+            page:1,
+            page_size:10,
+            OrganizationId: payload.OrganizationId,
+          }
+        });
+      }
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      });
+    },
+    *editCommunityGroup({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(editCommunityGroup, payload);
+      if(response.Message == "success"){
+        yield put({
+          type:'queryGroupList',
+          payload:{
+            page:1,
+            page_size:10,
+            OrganizationId: payload.OrganizationId,
+          }
+        });
+      }
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      });
+    },
+    *deleteCommunityGroup({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(deleteCommunityGroup, payload);
+      if(response.Message == "success"){
+        yield put({
+          type:'queryGroupList',
+          payload:{
+            page:1,
+            page_size:10,
+            OrganizationId: payload.OrganizationId,
+          }
+        });
+      }
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      });
     },
     *queryCommunityInfo({ payload }, { call, put }) {
       const response = yield call(queryCommunityInfo, payload);
@@ -105,6 +190,12 @@ export default {
       return {
         ...state,
         communityList: action.payload.Data,
+      };
+    },
+    getGroupList(state, action) {
+      return {
+        ...state,
+        groupList: action.payload.Data,
       };
     },
     getCommunityInfo(state, action) {

@@ -51,6 +51,9 @@ export const getRouterData = (app) => {
     '/group/&community&/communityAdd': {
       component: dynamicWrapper(app, ['group/community','getToken'], () => import('../pages/group/community/CommunityAdd'))
     },
+    '/group/&community&/communityGoup/:TeamId': {
+      component: dynamicWrapper(app, ['group/community','getToken'], () => import('../pages/group/community/communityGoup'))
+    },
     '/group/groupPurchase/groupPurchaseList': {
       checkOpen: checkRole(3000),
       component: dynamicWrapper(app, ['group/purchase','group/purchaseEnd'], () => import('../pages/group/groupPurchase/GroupPurchase'))

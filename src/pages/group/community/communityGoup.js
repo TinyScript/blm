@@ -1,12 +1,9 @@
 import React, {PureComponent} from 'react';
-import { Link } from 'dva/router';
 import {connect} from 'dva';
-import {Card,Button,List, message, Checkbox, Divider,Spin ,Row,Modal,Input,Table} from 'antd';
+import {Card,Button,Input,Table} from 'antd';
 const {Search} = Input;
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import {getLocalStorage} from '../../../utils/utils'
-import moment from 'moment';
-import InfiniteScroll from 'react-infinite-scroller';
 import style from './communityGoup.less';
 import styles from './Community.less';
 const userData = getLocalStorage('userData');
@@ -19,25 +16,38 @@ export default class communityGoup extends PureComponent {
 
   state = {
     page:1,
-    isChooseRoad:false,
-    
+    checkedList: [],
   }
 
   componentDidMount() {
-    this.getData();
-  }
+    const {dispatch,match:{params}} = this.props
+    console.log(params);
+    this.setState({
+      OrganizationId:userData.id,
+      TeamId:params.TeamId,
+    },()=>{
+      dispatch({
+        type: 'community/queryUnbindCommunityList',
+        payload:{
+          page:1,
+          page_size:5,
+          audit_state:1,
+          OrganizationId:userData.id,
+          TeamId:this.state.TeamId,
+        }
+      });
 
-  getData = () => {
-    const {dispatch} = this.props;
-    dispatch({
-      type: 'community/queryCommunityList',
-      payload:{
-        page:1,
-        page_size:10,
-        audit_state:1,
-        OrganizationId:userData.id,
-      }
-    });
+      dispatch({
+        type: 'community/queryBindCommunityList',
+        payload:{
+          page:1,
+          page_size:10,
+          audit_state:1,
+          OrganizationId:userData.id,
+          TeamId:this.state.TeamId,
+        }
+      });
+    })
   }
 
   handlerSubmit(){
@@ -69,8 +79,27 @@ export default class communityGoup extends PureComponent {
     })
   }
 
-  renderCommunityList = () => {
-    const {community:{communityList:{List,Count},loading,pagination}} = this.props;
+  search(val){
+    const {dispatch} = this.props;
+    this.setState({
+      searchValue:val,
+      current:1,
+    },()=>{
+      dispatch({
+        type: 'community/queryUnbindCommunityList',
+        payload:{
+          page:1,
+          OrganizationId: this.state.OrganizationId,
+          TeamId:this.state.TeamId,
+          page_size:10,
+          search:val,
+        },
+      });
+    })
+  }
+
+  renderUncheckCommunityList = () => {
+    const {community:{unBindCommunityList:{Groups,Count},loading,pagination}} = this.props;
     const {dispatch} = this.props;
 
     let columns = [
@@ -78,16 +107,6 @@ export default class communityGoup extends PureComponent {
       { title: '团长姓名', dataIndex: 'ManagerName'},
     ];
 
-    const change = (val,payload)=>{
-      dispatch({
-        type: 'community/uploadCommunityState',
-        payload: {
-          OrganizationId:payload.OrganizationId,
-          GroupId:payload.GroupId,
-          IsDisable:!val,
-        },
-      })
-    }
     columns.push({
       title: '操作',
       render : (text,record,index)=>{
@@ -125,7 +144,54 @@ export default class communityGoup extends PureComponent {
               bordered
               columns={columns}
               rowKey="GroupId"
-              dataSource={List}
+              dataSource={Groups}
+              loading={loading}
+              pagination={paginationProps}
+              onChange={this.accountListTableChange}
+            />
+          </div>
+        </div>
+      </Card>
+    )
+  }
+
+  renderCheckCommunityList = () => {
+    const {community:{bindCommunityList:{Groups,Count},loading,pagination}} = this.props;
+    const {dispatch} = this.props;
+
+    let columns = [
+      { title: '社团名称', dataIndex: 'Name'},
+      { title: '团长姓名', dataIndex: 'ManagerName'},
+    ];
+
+    columns.push({
+      title: '操作',
+      render : (text,record,index)=>{
+        return (
+          <div>
+            <Button>移除</Button>
+          </div>
+        )
+      }
+    })
+    const paginationProps = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      current:this.state.current,
+      total: Count,
+      ...pagination,
+    };
+
+    return (
+      <Card bordered={false}
+            title="社团列表">
+        <div>
+          <div className={styles.standardTable}>
+            <Table
+              bordered
+              columns={columns}
+              rowKey="GroupId"
+              dataSource={Groups}
               loading={loading}
               pagination={paginationProps}
               onChange={this.accountListTableChange}
@@ -137,8 +203,7 @@ export default class communityGoup extends PureComponent {
   }
 
   render() {
-    const {community:{ groupList, loading }}  = this.props;
-    console.log(this.props);
+    const {community:{ loading }}  = this.props;
 
     const breadcrumbList = [
       {
@@ -165,13 +230,13 @@ export default class communityGoup extends PureComponent {
             <div className={style.list}>
               <h3>待选</h3>
               <div className={style.listContent}>
-                {this.renderCommunityList()}
+                {this.renderUncheckCommunityList()}
               </div>
             </div>
             <div className={style.list}>
               <h3 style={{po:'fle'}}>已选</h3>
               <div className={style.listContent}>
-                
+                {this.renderCheckCommunityList()}
               </div>
             </div>
           </div>

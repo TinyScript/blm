@@ -19,6 +19,30 @@ export async function queryCommunityList(params) {
 }
 
 /**
+ * 获取已绑定社群列表
+ * @returns {Promise<Object>}
+ */
+export async function queryUnbindCommunityList(params) {
+
+  return request(`/api/v1/community/org/team/group/unbinded/list/${params.OrganizationId}/${params.TeamId}`,{
+    method:'POST',
+    body:params
+  })
+}
+
+/**
+ * 获取已绑定社群列表
+ * @returns {Promise<Object>}
+ */
+export async function queryBindCommunityList(params) {
+
+  return request(`/api/v1/community/org/team/group/binded/list/${params.OrganizationId}/${params.TeamId}`,{
+    method:'POST',
+    body:params
+  })
+}
+
+/**
  * 获取社团群组列表
  * @returns {Promise<Object>}
  */

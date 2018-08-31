@@ -1,6 +1,8 @@
 import {
   queryCommunityInfo,
   queryCommunityList,
+  queryUnbindCommunityList,
+  queryBindCommunityList,
   queryGroupList,
   addCommunityGroup,
   editCommunityGroup,
@@ -18,6 +20,12 @@ export default {
 
   state: {
     communityList: {
+      list: [],
+    },
+    unBindCommunityList: {
+      list: [],
+    },
+    bindCommunityList: {
       list: [],
     },
     groupList: {
@@ -39,6 +47,36 @@ export default {
       const response = yield call(queryCommunityList, payload);
       yield put({
         type: 'getCommunityList',
+        payload: response,
+      });
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      })
+    },
+    *queryUnbindCommunityList({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(queryUnbindCommunityList, payload);
+      yield put({
+        type: 'getUnbindCommunityList',
+        payload: response,
+      });
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      })
+    },
+    *queryBindCommunityList({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(queryBindCommunityList, payload);
+      yield put({
+        type: 'getBindCommunityList',
         payload: response,
       });
       yield put({
@@ -190,6 +228,18 @@ export default {
       return {
         ...state,
         communityList: action.payload.Data,
+      };
+    },
+    getUnbindCommunityList(state, action) {
+      return {
+        ...state,
+        unBindCommunityList: action.payload.Data,
+      };
+    },
+    getBindCommunityList(state, action) {
+      return {
+        ...state,
+        bindCommunityList: action.payload.Data,
       };
     },
     getGroupList(state, action) {

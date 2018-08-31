@@ -193,7 +193,7 @@ export default class communityGoup extends PureComponent {
     this.state.checkedList.map((val,key) => {
       midArray.push(val);
     })
-    console.log(midArray);
+    
     let columns = [
       { title: '社团名称', dataIndex: 'Name'},
       { title: '团长姓名', dataIndex: 'ManagerName'},

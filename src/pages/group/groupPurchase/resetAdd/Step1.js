@@ -115,7 +115,7 @@ class Step1 extends PureComponent {
 
   setVisibleType(e){
     const {dispatch,data} = this.props;
-    data['TeamVisibleState'] = e ? 1 : 0;
+    data['TeamVisibleState'] = e ? 0 : 1;
     dispatch({
       type:'purchaseEdit/setAdd',
       payload:{
@@ -288,9 +288,9 @@ class Step1 extends PureComponent {
             {...formItemLayout}
             label="部分社团可见"
           >
-            <Switch checked={data.TeamVisibleState===1 ? true : false} onChange={(e)=>{this.setVisibleType(e)}}/>
+            <Switch checked={data.TeamVisibleState===0 ? true : false} onChange={(e)=>{this.setVisibleType(e)}}/>
           </Form.Item>
-          {data.TeamVisibleState === 1?<Form.Item
+          {data.TeamVisibleState === 0?<Form.Item
             {...formItemLayout}
             colon={false}
             required={false}

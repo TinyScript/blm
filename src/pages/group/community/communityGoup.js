@@ -98,10 +98,34 @@ export default class communityGoup extends PureComponent {
     })
   }
 
+  addCommunity = (e,record) => {
+    e.preventDefault();
+    let midArray = this.state.checkedList.slice(0);
+    midArray.push(record);
+    this.setState({
+      checkedList: midArray
+    })
+  }
+
   renderUncheckCommunityList = () => {
     const {community:{unBindCommunityList:{Groups,Count},loading,pagination}} = this.props;
     const {dispatch} = this.props;
-
+    // 筛选掉已经选中的值
+    let checkedArray = [];
+    if(Groups){
+      for(let i=0; i<Groups.length; i++){
+        let midBol = true;
+        for(let j=0; j<this.state.checkedList.length; j++){
+          if(Groups[i].GroupId == this.state.checkedList[j].GroupId){
+            midBol = false;
+            break;
+          }
+        }
+        if(midBol){
+          checkedArray.push(Groups[i]);
+        }
+      }
+    }
     let columns = [
       { title: '社团名称', dataIndex: 'Name'},
       { title: '团长姓名', dataIndex: 'ManagerName'},
@@ -112,7 +136,7 @@ export default class communityGoup extends PureComponent {
       render : (text,record,index)=>{
         return (
           <div>
-            <Button>添加</Button>
+            <Button onClick = {(e) => {this.addCommunity(e,record)}}>添加</Button>
           </div>
         )
       }
@@ -144,7 +168,7 @@ export default class communityGoup extends PureComponent {
               bordered
               columns={columns}
               rowKey="GroupId"
-              dataSource={Groups}
+              dataSource={checkedArray}
               loading={loading}
               pagination={paginationProps}
               onChange={this.accountListTableChange}
@@ -158,7 +182,18 @@ export default class communityGoup extends PureComponent {
   renderCheckCommunityList = () => {
     const {community:{bindCommunityList:{Groups,Count},loading,pagination}} = this.props;
     const {dispatch} = this.props;
-
+    console.log(this.state.checkedList)
+    // 补全选中的值
+    let midArray = [];
+    if(Groups){
+      Groups.map((val,key) => {
+        midArray.push(val);
+      })
+    }
+    this.state.checkedList.map((val,key) => {
+      midArray.push(val);
+    })
+    console.log(midArray);
     let columns = [
       { title: '社团名称', dataIndex: 'Name'},
       { title: '团长姓名', dataIndex: 'ManagerName'},
@@ -191,9 +226,9 @@ export default class communityGoup extends PureComponent {
               bordered
               columns={columns}
               rowKey="GroupId"
-              dataSource={Groups}
+              dataSource={midArray}
               loading={loading}
-              pagination={paginationProps}
+              pagination={false}
               onChange={this.accountListTableChange}
             />
           </div>

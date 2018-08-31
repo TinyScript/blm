@@ -1,17 +1,18 @@
 import React, {PureComponent} from 'react';
 import { Link } from 'dva/router';
 import {connect} from 'dva';
-import {Card,Button,List, message, Checkbox, Divider,Spin ,Row,Modal,} from 'antd';
+import {Card,Button,List, message, Checkbox, Divider,Spin ,Row,Modal,Input,Table} from 'antd';
+const {Search} = Input;
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import {getLocalStorage} from '../../../utils/utils'
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import style from './communityGoup.less';
-
-
+import styles from './Community.less';
 const userData = getLocalStorage('userData');
+
 @connect(state => ({
-  distribution: state.distribution,
+  community: state.community,
 }))
 
 export default class communityGoup extends PureComponent {
@@ -22,115 +23,25 @@ export default class communityGoup extends PureComponent {
     
   }
 
-  formatTime(val,formatString='YYYY年MM月DD日'){
-    return moment(val).utcOffset(val).format(formatString)
+  componentDidMount() {
+    this.getData();
   }
 
-  componentWillMount() {
-    this.getData(1);
-  }
-
-  getData = (page) => {
+  getData = () => {
     const {dispatch} = this.props;
     dispatch({
-      type: 'distribution/queryFinishBuyingList',
+      type: 'community/queryCommunityList',
       payload:{
-        page:page,
+        page:1,
         page_size:10,
-        OrganizationId:userData.id
+        audit_state:1,
+        OrganizationId:userData.id,
       }
     });
   }
-
-  handleInfiniteOnLoad = () => {
-
-    let page = this.state.page + 1;
-
-    this.setState({
-      page:page
-    })
-
-    this.getData(page);
-
-  }
-
-  onChange(e,id) {
-
-    const {dispatch,distribution:{finishBuyingList}}  = this.props;
-    // let newData = finishBuyingList
-    finishBuyingList.List.map((val,index)=>{
-      if(val.TaskId === id ){
-        finishBuyingList.List[index].isChecked = e.target.checked;
-      }
-    })
-
-    dispatch({
-      type: 'distribution/setDinishBuyingData',
-      payload:finishBuyingList
-    });
-  }
-
-  onAllChange(e,Time) {
-
-    const {dispatch,distribution:{finishBuyingList}}  = this.props;
-    // let newData = finishBuyingList
-    finishBuyingList.List.map((val,index)=>{
-
-      if(this.formatTime(val.StartTime) === Time ){
-        finishBuyingList.List[index].isChecked = e.target.checked;
-      }
-    })
-
-    dispatch({
-      type: 'distribution/setDinishBuyingData',
-      payload:finishBuyingList
-    });
-  }
-
-  componentWillUnmount(){
-    const {dispatch} = this.props;
-    dispatch({
-      type: 'distribution/resetFinishBuyingList'
-    });
-  }
-
-  getList(data){
-    const newList = [];
-    return data.map((val,i)=>{
-      newList[i] = this.formatTime(val.StartTime);
-      const isCheck = newList[i] === newList[i-1]
-      return (
-        !isCheck ? <div key={i}>
-          <Checkbox
-            onChange={(e)=>{this.onAllChange(e,newList[i])}}
-            style={{fontSize:18,fontWeight:600,marginBottom:20}}>{newList[i]}
-          </Checkbox>
-            {data.map((value,q)=>{
-              return this.formatTime(value.StartTime)===newList[i] ?
-                <div style={{paddingLeft:20}} key={q}>
-                  <Checkbox
-                    checked={value.isChecked}
-                    onChange={(e)=>{this.onChange(e,value.TaskId)}}
-                    style={{overflow: 'hidden',display:'flex',alignItems: 'center'}}
-                  >
-                    <div>
-                    <img style={{width:60,height:60,float:'left',marginRight:10}} src={value.CoverPicture}/>
-                    </div>
-                    <div style={{marginLeft:110,marginTop:4}}>
-                      <h4>名称：{value.Title}</h4>
-                      <div>截单时间：{this.formatTime(value.EndTime,'YYYY.MM.DD HH:mm')}</div>
-                    </div>
-                  </Checkbox>
-                  <Divider type="horizontal" />
-                </div> :''
-            })}
-        </div>:''
-      )
-    })
-  };
 
   handlerSubmit(){
-    const {dispatch,distribution:{finishBuyingList}}  = this.props;
+    const {dispatch,community:{finishBuyingList}}  = this.props;
 
     let data = [];
 
@@ -150,7 +61,7 @@ export default class communityGoup extends PureComponent {
     })
 
     dispatch({
-      type:'distribution/submitDistributionAdd',
+      type:'community/submitDistributionAdd',
       payload:{
         TaskLineIds:data,
         OrganizationId:userData.id
@@ -158,58 +69,76 @@ export default class communityGoup extends PureComponent {
     })
   }
 
-  LineList = [];
-  index = 0;
-  chooseRoutes = (LineList,i) => {
-    this.LineList = LineList;
-    this.index = i;
-    this.setState({
-      isChooseRoad:true,
-    })
-  }
+  renderCommunityList = () => {
+    const {community:{communityList:{List,Count},loading,pagination}} = this.props;
+    const {dispatch} = this.props;
 
-  unChooseRoutes = () => {
-    this.setState({
-      isChooseRoad:false,
-    })
-  }
+    let columns = [
+      { title: '社团名称', dataIndex: 'Name'},
+      { title: '团长姓名', dataIndex: 'ManagerName'},
+    ];
 
-  chooseRoad = () => {
-    this.setState({
-      isChooseRoad:false,
+    const change = (val,payload)=>{
+      dispatch({
+        type: 'community/uploadCommunityState',
+        payload: {
+          OrganizationId:payload.OrganizationId,
+          GroupId:payload.GroupId,
+          IsDisable:!val,
+        },
+      })
+    }
+    columns.push({
+      title: '操作',
+      render : (text,record,index)=>{
+        return (
+          <div>
+            <Button>添加</Button>
+          </div>
+        )
+      }
     })
-  }
+    const paginationProps = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      current:this.state.current,
+      total: Count,
+      ...pagination,
+    };
 
-  getCheckList(data){
-    const newList = [];
-    return data.map((val,i)=>{
-      newList[i] = this.formatTime(val.StartTime);
-      return (
-        val.isChecked ? <div style={{marginTop:20}} key={i}>
-          <Checkbox
-            checked={true}
-            style={{overflow: 'hidden',display:'flex',alignItems: 'center'}}
-            onChange={(e)=>{this.onChange(e,val.TaskId)}}
-          >
-            <div>
-              <img style={{width:60,height:60,float:'left',marginRight:10}} src={val.CoverPicture}/>
-            </div>
-            <div style={{marginLeft:110,marginTop:4}}>
-              <h4>名称：{val.Title}</h4>
-              <div>截单时间：{this.formatTime(val.EndTime,'YYYY.MM.DD HH:mm')}</div>
-              {
-                val.IsSelectedAllLines?<Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={()=>{this.chooseRoutes(val.LineList,i)}}>全选路线</Button>:<Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={()=>{this.chooseRoutes(val.LineList,i)}}>部分路线</Button>
-              }
-            </div>
-          </Checkbox>
-          <Divider type="horizontal" />
-        </div>:''
-      )
-    })
-  };
+    const extraContent = (
+      <div >
+        <Search
+          enterButton
+          placeholder="用户名/手机号"
+          onSearch={(e) => {this.search(e)}}
+        />
+      </div>
+    );
+    return (
+      <Card bordered={false}
+            extra={extraContent}
+            title="社团列表">
+        <div>
+          <div className={styles.standardTable}>
+            <Table
+              bordered
+              columns={columns}
+              rowKey="GroupId"
+              dataSource={List}
+              loading={loading}
+              pagination={paginationProps}
+              onChange={this.accountListTableChange}
+            />
+          </div>
+        </div>
+      </Card>
+    )
+  }
 
   render() {
-    const {distribution:{ finishBuyingList, loading }}  = this.props;
+    const {community:{ groupList, loading }}  = this.props;
+    console.log(this.props);
 
     const breadcrumbList = [
       {
@@ -217,12 +146,11 @@ export default class communityGoup extends PureComponent {
         href:'/'
       },
       {
-        title:'送货单',
-        href:'/group/groupPurchase/distributionList'
-      }
-      ,
+        title:'社群管理',
+        href:'/group/community'
+      },
       {
-        title:'创建送货单',
+        title:'关联社区',
       }
     ]
 
@@ -231,45 +159,24 @@ export default class communityGoup extends PureComponent {
         breadcrumbList={breadcrumbList}
       >
         <Card bordered={false}
-              title="创建送货单"
+              title="关联社区"
         >
           <div style={{display:'flex',justifyContent:'space-between'}}>
             <div className={style.list}>
               <h3>待选</h3>
               <div className={style.listContent}>
-                <InfiniteScroll
-                  initialLoad={false}
-                  pageStart={0}
-                  loadMore={this.handleInfiniteOnLoad}
-                  hasMore={!finishBuyingList.loading && finishBuyingList.hasMore}
-                  useWindow={false}
-                >
-                  <List>
-                    {this.getList(finishBuyingList.List)}
-                    {finishBuyingList.loading && finishBuyingList.hasMore && <Spin className={style.demoLoading} />}
-                  </List>
-                </InfiniteScroll>
+                {this.renderCommunityList()}
               </div>
             </div>
             <div className={style.list}>
               <h3 style={{po:'fle'}}>已选</h3>
               <div className={style.listContent}>
-                <List>
-                  {this.getCheckList(finishBuyingList.List)}
-                </List>
+                
               </div>
             </div>
           </div>
-          <div style={{display:'flex',marginTop:20,justifyContent:'center'}} ><Button loading={loading} onClick={()=>{this.handlerSubmit()}}>创建</Button></div>
+          <div style={{display:'flex',marginTop:20,justifyContent:'center'}} ><Button loading={loading} onClick={()=>{this.handlerSubmit()}}>确定</Button></div>
         </Card>
-        {/* <Modal 
-          title="编辑路线"
-          visible={this.state.isChooseRoad}
-          onOk={this.chooseRoad}
-          onCancel={this.unChooseRoutes}
-        >
-          <RouteListTable lineList={this.LineList} groupIndex = {this.index}></RouteListTable>
-        </Modal> */}
       </PageHeaderLayout>
 
     );

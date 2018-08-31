@@ -25,7 +25,7 @@ export default class StandardTable extends PureComponent {
     audit_state:1,
     searchValue:'',
     expandedRowKeys:[],
-    operationkey: '2',
+    operationkey: '1',
     groupVisible: false,
   };
 

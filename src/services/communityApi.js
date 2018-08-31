@@ -129,3 +129,25 @@ export async function uploadCommunityState(params) {
     body: params,
   });
 }
+
+/**
+ * 添加群组
+ * @returns {Promise<Object>}
+ */
+export async function addCommunity(params) {
+  return request(`/api/v1/community/org/team/bind/group/${params.OrganizationId}/${params.TeamId}`, {
+    method: 'POST',
+    body: params,
+  });
+}
+
+/**
+ * 删除群组
+ * @returns {Promise<Object>}
+ */
+export async function delCommunity(params) {
+  return request(`/api/v1/community/org/team/unbind/group/${params.OrganizationId}/${params.TeamId}`, {
+    method: 'POST',
+    body: params,
+  });
+}

@@ -11,6 +11,8 @@ import {
   submitCommunityAdd,
   submitCommunityEdit,
   uploadCommunityState,
+  addCommunity,
+  delCommunity,
 } from '../../services/communityApi';
 
 import {routerRedux} from 'dva/router'
@@ -219,6 +221,64 @@ export default {
 
       const res = yield call(uploadCommunityState, payload);
 
+    },
+    *addCommunity({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(addCommunity, payload);
+      yield put({
+        type: 'queryUnbindCommunityList',
+        payload: {
+          ...payload,
+          page:1,
+          page_size:10,
+          audit_state:1,
+        },
+      });
+      yield put({
+        type: 'queryBindCommunityList',
+        payload: {
+          ...payload,
+          page:1,
+          page_size:10,
+          audit_state:1,
+        },
+      });
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      })
+    },
+    *delCommunity({ payload }, { call, put }) {
+      yield put({
+        type: 'changeLoading',
+        payload: true,
+      });
+      const response = yield call(delCommunity, payload);
+      yield put({
+        type: 'queryUnbindCommunityList',
+        payload: {
+          ...payload,
+          page:1,
+          page_size:10,
+          audit_state:1,
+        },
+      });
+      yield put({
+        type: 'queryBindCommunityList',
+        payload: {
+          ...payload,
+          page:1,
+          page_size:10,
+          audit_state:1,
+        },
+      });
+      yield put({
+        type: 'changeLoading',
+        payload: false,
+      })
     },
 
   },

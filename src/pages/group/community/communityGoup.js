@@ -30,7 +30,7 @@ export default class communityGoup extends PureComponent {
         type: 'community/queryUnbindCommunityList',
         payload:{
           page:1,
-          page_size:5,
+          page_size:10,
           audit_state:1,
           OrganizationId:userData.id,
           TeamId:this.state.TeamId,
@@ -47,35 +47,6 @@ export default class communityGoup extends PureComponent {
           TeamId:this.state.TeamId,
         }
       });
-    })
-  }
-
-  handlerSubmit(){
-    const {dispatch,community:{finishBuyingList}}  = this.props;
-
-    let data = [];
-
-    finishBuyingList.List.map(val=>{
-      if(val.isChecked){
-        let midObj = {};
-        midObj.TaskId = val.TaskId;
-        let midArray = [];
-        val.LineList.map(val => {
-          if(val.IsSelected){
-            midArray.push(val.LineId);
-          }
-        })
-        midObj.LineIds = midArray;
-        data.push(midObj);
-      }
-    })
-
-    dispatch({
-      type:'community/submitDistributionAdd',
-      payload:{
-        TaskLineIds:data,
-        OrganizationId:userData.id
-      }
     })
   }
 
@@ -100,32 +71,33 @@ export default class communityGoup extends PureComponent {
 
   addCommunity = (e,record) => {
     e.preventDefault();
-    let midArray = this.state.checkedList.slice(0);
-    midArray.push(record);
-    this.setState({
-      checkedList: midArray
-    })
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'community/addCommunity',
+      payload:{
+        OrganizationId: this.state.OrganizationId,
+        TeamId:this.state.TeamId,
+        GroupID:record.GroupId,
+      },
+    });
+  }
+
+  delCommunity = (e,record) => {
+    e.preventDefault();
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'community/delCommunity',
+      payload:{
+        OrganizationId: this.state.OrganizationId,
+        TeamId:this.state.TeamId,
+        GroupID:record.GroupId,
+      },
+    });
   }
 
   renderUncheckCommunityList = () => {
     const {community:{unBindCommunityList:{Groups,Count},loading,pagination}} = this.props;
-    const {dispatch} = this.props;
-    // 筛选掉已经选中的值
-    let checkedArray = [];
-    if(Groups){
-      for(let i=0; i<Groups.length; i++){
-        let midBol = true;
-        for(let j=0; j<this.state.checkedList.length; j++){
-          if(Groups[i].GroupId == this.state.checkedList[j].GroupId){
-            midBol = false;
-            break;
-          }
-        }
-        if(midBol){
-          checkedArray.push(Groups[i]);
-        }
-      }
-    }
+
     let columns = [
       { title: '社团名称', dataIndex: 'Name'},
       { title: '团长姓名', dataIndex: 'ManagerName'},
@@ -168,7 +140,7 @@ export default class communityGoup extends PureComponent {
               bordered
               columns={columns}
               rowKey="GroupId"
-              dataSource={checkedArray}
+              dataSource={Groups}
               loading={loading}
               pagination={paginationProps}
               onChange={this.accountListTableChange}
@@ -181,18 +153,6 @@ export default class communityGoup extends PureComponent {
 
   renderCheckCommunityList = () => {
     const {community:{bindCommunityList:{Groups,Count},loading,pagination}} = this.props;
-    const {dispatch} = this.props;
-    console.log(this.state.checkedList)
-    // 补全选中的值
-    let midArray = [];
-    if(Groups){
-      Groups.map((val,key) => {
-        midArray.push(val);
-      })
-    }
-    this.state.checkedList.map((val,key) => {
-      midArray.push(val);
-    })
     
     let columns = [
       { title: '社团名称', dataIndex: 'Name'},
@@ -204,7 +164,7 @@ export default class communityGoup extends PureComponent {
       render : (text,record,index)=>{
         return (
           <div>
-            <Button>移除</Button>
+            <Button onClick = {(e) => {this.delCommunity(e,record)}}>移除</Button>
           </div>
         )
       }
@@ -226,7 +186,7 @@ export default class communityGoup extends PureComponent {
               bordered
               columns={columns}
               rowKey="GroupId"
-              dataSource={midArray}
+              dataSource={Groups}
               loading={loading}
               pagination={false}
               onChange={this.accountListTableChange}
@@ -275,7 +235,6 @@ export default class communityGoup extends PureComponent {
               </div>
             </div>
           </div>
-          <div style={{display:'flex',marginTop:20,justifyContent:'center'}} ><Button loading={loading} onClick={()=>{this.handlerSubmit()}}>确定</Button></div>
         </Card>
       </PageHeaderLayout>
 

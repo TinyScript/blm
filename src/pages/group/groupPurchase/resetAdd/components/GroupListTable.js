@@ -64,7 +64,7 @@ class GroupListTable extends PureComponent {
   tableChange = (pagination, filtersArg, sorter) => {
     const {dispatch} = this.props;
     dispatch({
-      type: 'purchaseAdd/queryGroupList',
+      type: 'purchaseEdit/queryGroupList',
       payload:{
         OrganizationId:userData.id,
         page: pagination.current,
@@ -75,6 +75,9 @@ class GroupListTable extends PureComponent {
 
   render() {
     const { purchaseInfo: { groupList:{List,pagination,Count}, loading}, data } = this.props;
+    // if(groupList){
+    //   console.log(groupList);
+    // }
     let columns = [
       {
         title: '路线名称', 
@@ -106,6 +109,7 @@ class GroupListTable extends PureComponent {
           dataSource={List}
           columns={columns}
           pagination={paginationProps}
+          onChange={this.tableChange}
         />
       </div>
     );

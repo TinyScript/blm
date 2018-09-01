@@ -89,6 +89,45 @@ export default class StandardTable extends PureComponent {
     });
   }
 
+  groupListTableChange = (pagination, filtersArg, sorter) => {
+    const {dispatch} = this.props;
+    // const {formValues} = this.state;
+    // this.setState({
+    //   current:pagination.current
+    // })
+    // const filters = Object.keys(filtersArg).reduce((obj, key) => {
+    //   const newObj = {...obj};
+    //   newObj[key] = getValue(filtersArg[key]);
+    //   return newObj;
+    // }, {});
+
+    // const params = {
+    //   page: pagination.current,
+    //   page_size: pagination.pageSize,
+    //   OrganizationId: this.state.OrganizationId,
+    //   audit_state:this.state.audit_state,
+    //   search:this.state.searchValue,
+    //   ...formValues,
+    //   ...filters,
+    // };
+    // if (sorter.field) {
+    //   params.sorter = `${sorter.field}_${sorter.order}`;
+    // }
+
+    // dispatch({
+    //   type: 'community/queryCommunityList',
+    //   payload: params,
+    // });
+    dispatch({
+      type: 'community/queryGroupList',
+      payload:{
+        page: pagination.current,
+        page_size:10,
+        OrganizationId:this.state.OrganizationId,
+      }
+    });
+  }
+
   getInfo(isOpen,val){
     if(isOpen){
       this.props.dispatch({
@@ -130,7 +169,6 @@ export default class StandardTable extends PureComponent {
     })
   }
   radioOnChange(val){
-    console.log(val);
     const {dispatch} = this.props;
     this.setState({
       audit_state:parseInt(val.target.value),
@@ -431,21 +469,9 @@ export default class StandardTable extends PureComponent {
       }
     })
 
-    const change = (val,payload)=>{
-      dispatch({
-        type: 'community/uploadCommunityState',
-        payload: {
-          OrganizationId:payload.OrganizationId,
-          GroupId:payload.GroupId,
-          IsDisable:!val,
-        },
-      })
-    }
-
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: true,
-      current:this.state.current,
       total: Count,
       ...pagination,
     };
@@ -462,7 +488,7 @@ export default class StandardTable extends PureComponent {
             dataSource={List}
             loading={loading}
             pagination={paginationProps}
-            onChange={this.accountListTableChange}
+            onChange={this.groupListTableChange}
           />
         </div>
       </Card>

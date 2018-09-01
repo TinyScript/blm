@@ -289,7 +289,7 @@ class Step1 extends PureComponent {
             {...formItemLayout}
             label="部分社团可见"
           >
-            <Switch checked={data.TeamVisibleState===0 ? true : false} onChange={(e)=>{this.setVisibleType(e)}}/>
+            <Switch disabled={GroupState > 0 ? true : false} checked={data.TeamVisibleState===0 ? true : false} onChange={(e)=>{this.setVisibleType(e)}}/>
           </Form.Item>
           {data.TeamVisibleState === 0?<Form.Item
             {...formItemLayout}
@@ -297,7 +297,7 @@ class Step1 extends PureComponent {
             required={false}
             label=" "
           >
-            <Button onClick={this.chooseGroup}>请选择群组</Button>
+            <Button disabled={GroupState > 0 ? true : false} onClick={this.chooseGroup}>请选择群组</Button>
           </Form.Item>:''}
         </Form>
         <Modal 

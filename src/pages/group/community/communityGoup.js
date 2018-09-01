@@ -21,7 +21,6 @@ export default class communityGoup extends PureComponent {
 
   componentDidMount() {
     const {dispatch,match:{params}} = this.props
-    console.log(params);
     this.setState({
       OrganizationId:userData.id,
       TeamId:params.TeamId,
@@ -63,7 +62,7 @@ export default class communityGoup extends PureComponent {
           OrganizationId: this.state.OrganizationId,
           TeamId:this.state.TeamId,
           page_size:10,
-          search:val,
+          Key:val,
         },
       });
     })
@@ -142,7 +141,7 @@ export default class communityGoup extends PureComponent {
               rowKey="GroupId"
               dataSource={Groups}
               loading={loading}
-              pagination={paginationProps}
+              pagination={false}
               onChange={this.accountListTableChange}
             />
           </div>

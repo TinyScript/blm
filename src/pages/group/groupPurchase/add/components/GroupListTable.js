@@ -19,13 +19,12 @@ class GroupListTable extends PureComponent {
 
   getData(){
     const {dispatch} = this.props;
-    console.log(this.props)
     dispatch({
       type: 'purchaseAdd/queryGroupList',
       payload:{
         OrganizationId:userData.id,
         page:1,
-        page_size:30,
+        page_size:10,
       }
     });
   }
@@ -62,8 +61,20 @@ class GroupListTable extends PureComponent {
     }
   }
 
+  tableChange = (pagination, filtersArg, sorter) => {
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'purchaseAdd/queryGroupList',
+      payload:{
+        OrganizationId:userData.id,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      }
+    });
+  }
+
   render() {
-    const { purchaseInfo: { groupList:{List ,Count}, loading}, data } = this.props;
+    const { purchaseInfo: { groupList:{List ,pagination,Count}, loading}, data } = this.props;
     let columns = [
       {
         title: '路线名称', 
@@ -79,12 +90,12 @@ class GroupListTable extends PureComponent {
           </div>
         )},
     },)
-    // const paginationProps = {
-    //   showSizeChanger: true,
-    //   showQuickJumper: true,
-    //   total: Count,
-    //   ...pagination,
-    // };
+    const paginationProps = {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      total: Count,
+      ...pagination,
+    };
     return (
       <div className={styles.container}>
         <Table
@@ -94,7 +105,8 @@ class GroupListTable extends PureComponent {
           rowKey='TeamId'
           dataSource={List}
           columns={columns}
-          pagination={false}
+          pagination={paginationProps}
+          onChange={this.tableChange}
         />
       </div>
     );

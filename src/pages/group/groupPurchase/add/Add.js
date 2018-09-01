@@ -120,10 +120,6 @@ class StepForm extends PureComponent {
       if(!data.StartTime){
         data.StartTime  = data.ShowStartTime;
       }
-      console.log(JSON.stringify({
-        ...data,
-        OrganizationId:userData.id
-      }));
       dispatch({
         type: 'purchaseAdd/uploadPurchaseAdd',
         payload: {

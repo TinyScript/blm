@@ -75,9 +75,6 @@ class GroupListTable extends PureComponent {
 
   render() {
     const { purchaseInfo: { groupList:{List,pagination,Count}, loading}, data } = this.props;
-    // if(groupList){
-    //   console.log(groupList);
-    // }
     let columns = [
       {
         title: '路线名称', 

@@ -420,7 +420,6 @@ export default class StandardTable extends PureComponent {
               },
             });
           }else if(that.groupOperate == 'edit'){
-            console.log(that.groupOperateInfo)
             dispatch({
               type: 'community/editCommunityGroup',
               payload: {

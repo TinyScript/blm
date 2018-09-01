@@ -31,8 +31,6 @@ class StepForm extends PureComponent {
   }
   sumbit(){
     const {stepFormData,dispatch,form} = this.props;
-    console.log(this.props);
-    console.log(stepFormData);
     let Info = this.childCp.childInfoCp.handleSubmit();
 
     let IsShow = false;

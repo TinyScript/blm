@@ -24,7 +24,7 @@ class GroupListTable extends PureComponent {
       payload:{
         OrganizationId:userData.id,
         page:1,
-        page_size:30,
+        page_size:10,
       }
     });
   }

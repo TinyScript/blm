@@ -86,7 +86,7 @@ class GroupListTable extends PureComponent {
       render: (text,record,index) => {
         return (
           <div>
-            <Switch checkedChildren="开启" defaultChecked={ data.TeamIds&&data.TeamIds.indexOf(record.TeamId)>0?true:false } onChange={(val)=>{this.change(val,record)}} unCheckedChildren="禁用"  />
+            <Switch checkedChildren="开启" checked={ data.TeamIds&&data.TeamIds.indexOf(record.TeamId)>=0?true:false } onChange={(val)=>{this.change(val,record)}} unCheckedChildren="禁用"  />
           </div>
         )},
     },)

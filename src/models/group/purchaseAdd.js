@@ -26,7 +26,9 @@ export default {
       Sku:[],
       SellType:1,
       Specification:[],
-      Combination:[]
+      Combination:[],
+      AllowCancel:0,
+      TeamVisibleState:1,
     },
     Tokens:{},
     stepFormSubmitting: false,

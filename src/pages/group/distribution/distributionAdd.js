@@ -161,7 +161,8 @@ export default class distributionAdd extends PureComponent {
 
   LineList = [];
   index = 0;
-  chooseRoutes = (LineList,i) => {
+  chooseRoutes = (e,LineList,i) => {
+    e.preventDefault();
     this.LineList = LineList;
     this.index = i;
     this.setState({
@@ -199,7 +200,7 @@ export default class distributionAdd extends PureComponent {
               <h4>名称：{val.Title}</h4>
               <div>截单时间：{this.formatTime(val.EndTime,'YYYY.MM.DD HH:mm')}</div>
               {
-                val.IsSelectedAllLines?<Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={()=>{this.chooseRoutes(val.LineList,i)}}>全选路线</Button>:<Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={()=>{this.chooseRoutes(val.LineList,i)}}>部分路线</Button>
+                val.IsSelectedAllLines?<Button type="primary" style = {{backgroundColor: 'green',borderColor: 'green', marginTop: '6px',}} onClick={(e)=>{this.chooseRoutes(e,val.LineList,i)}}>全选路线</Button>:<Button type="primary" style = {{backgroundColor: 'orange',borderColor: 'orange', marginTop: '6px',}}  onClick={(e)=>{this.chooseRoutes(e,val.LineList,i)}}>部分路线</Button>
               }
             </div>
           </Checkbox>
